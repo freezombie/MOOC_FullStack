@@ -1,0 +1,17 @@
+.countrylist {
+    border-left: thick solid #ffffff;
+    height: 100%;
+    width: 15%;
+}
+
+.countryview {
+    width: 65%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.solocountryview {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
