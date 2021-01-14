@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import {createPerson,getAllPersons, deletePersonFromDb, updatePerson} from './services/persons'
 
 const App = () => {
     const [ persons, setPersons] = useState([]) 
     const [ newName, setNewName ] = useState('')
     const [ newNumber, setNewNumber] = useState('');
     const [ filter, setFilter] = useState('');
-    const url = 'http://localhost:3000/persons'
     
     useEffect(() => {
-        axios.get(url).then(res => {
-            setPersons(res.data);
+        getAllPersons().then(initialNotes => {
+            setPersons(initialNotes);
         })
     },[])
 
@@ -39,11 +38,40 @@ const App = () => {
             name: newName,
             number: newNumber,
         }
-        setPersons(persons.concat(personObject));
+        createPerson(personObject)
+        .then(returnedPerson => {
+            if(typeof returnedPerson !== 'number') {
+                setPersons(persons.concat(returnedPerson));
+                setNewNumber('');
+                setNewName('');
+            } else {
+                window.alert("Wrong return from server");
+            }
+        })
     } else {
-        window.alert(`${newName} is already added to phonebook`);
+        if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+            const oldObj = persons.find(person => person.name === newName);
+            const updatedPerson = {
+                name: oldObj.name,
+                number: newNumber,
+            }
+
+            updatePerson(oldObj.id,updatedPerson);
+            const newArr = persons.filter(obj =>
+                obj.id !== oldObj.id);
+            setPersons(newArr.concat(updatedPerson));
+        }            
     }
   }
+
+    const deletePerson = (person) => {
+        console.log(person);
+        if(window.confirm(`Do you really want to delete ${person.name}`)) {
+            deletePersonFromDb(person.id);
+            setPersons(persons.filter(obj => 
+                obj.id !== person.id))
+        }
+    }
 
   return (
     <div>
@@ -52,7 +80,7 @@ const App = () => {
       <h3>Add a new number</h3>
       <PersonForm add={addPerson} nameChange={handleNameChange} numberChange={handleNumberChange}/>
       <h3>Numbers</h3>
-      <Persons persons={persons} filter={filter}/>
+      <Persons persons={persons} filter={filter} deletePerson={deletePerson}/>
     </div>
   )
 }
