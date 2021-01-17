@@ -5,7 +5,7 @@ const App = ({courses}) => {
     return (
         <div>
             {courses.map(course =>
-            <Course courseInfo={course} />)}
+            <Course courseInfo={course} key={course.id}/>)}
         </div>
     )
 }

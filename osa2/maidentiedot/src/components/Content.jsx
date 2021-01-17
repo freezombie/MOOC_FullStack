@@ -7,11 +7,11 @@ const Content = ({data}) => {
     const [selectedCountry, setSelectedCountry] = useState({})
 
     useEffect(() => {
+        setSelectedCountry({});
         if(data.length === 1) {
             setSelectedCountry(data[0])
         }
-        console.log(selectedCountry);
-    }, [data, selectedCountry])
+    }, [data])
 
     if(data.length === 0 || data.length > 10) {
         return(

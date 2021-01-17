@@ -13,7 +13,7 @@ const CountryList = ({ data, setSelectedCountry}) => {
         <>
             <ul>
                 {data.map(country => 
-                    <li><button key={country.name} onClick={handleClick} value={country.name}>{country.name}</button></li>
+                    <li key={country.name}><button onClick={handleClick} value={country.name}>{country.name}</button></li>
                 )}
             </ul>
         </>

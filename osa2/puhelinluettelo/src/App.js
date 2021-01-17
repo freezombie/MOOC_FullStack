@@ -80,6 +80,17 @@ const App = () => {
                 setTimeout(() => {
                     setMessage('');
                 }, 5000)
+            })
+            .catch(error => {
+                //console.log(error);
+                setErrorStatus(true);
+                setMessage(`Information of ${updatedPerson.name} has already been removed from the server`)
+                setTimeout(() => {
+                    setMessage('');
+                    setErrorStatus(false);
+                }, 5000)
+                setPersons(persons.filter(obj =>
+                    obj.id !== oldObj.id))
             })            
         }            
     }

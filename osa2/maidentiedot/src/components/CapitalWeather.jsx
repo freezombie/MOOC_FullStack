@@ -10,10 +10,8 @@ const CapitalWeather = ({capital}) => {
         axios.get(url).then(res => {
             setWeatherData(res.data);
         })
-    },[])
+    },[url])
 
-    console.log(weatherData);
-    console.log(api_key);
     return(        
         <div>
             <h2>Weather in {capital}</h2>

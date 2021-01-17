@@ -47,5 +47,8 @@ const courses = [
     }
     ]
 
-ReactDOM.render(<App courses={courses}/>, 
-document.getElementById('root'))
+ReactDOM.render(
+    <React.StrictMode>
+        <App courses={courses}/>
+    </React.StrictMode>,
+    document.getElementById('root'))
