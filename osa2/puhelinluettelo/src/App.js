@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 import {createPerson,getAllPersons, deletePersonFromDb, updatePerson} from './services/persons'
 
 const App = () => {
-    const [ persons, setPersons] = useState([]) 
-    const [ newName, setNewName ] = useState('')
+    const [ persons, setPersons] = useState([]);
+    const [ newName, setNewName ] = useState('');
     const [ newNumber, setNewNumber] = useState('');
     const [ filter, setFilter] = useState('');
+    const [ message, setMessage] = useState('');
+    const [ errorStatus, setErrorStatus ] = useState(false); 
     
     useEffect(() => {
         getAllPersons().then(initialNotes => {
@@ -31,21 +34,34 @@ const App = () => {
     const addPerson = (event) => {
     event.preventDefault();
     if(newName==='' || newNumber==='') {
-        window.alert("You must submit both a name and a phonenumber");
+        setErrorStatus(true);
+        setMessage("You must submit both a name and a phonenumber");
+        setTimeout(() => {
+            setMessage('');
+            setErrorStatus(false);
+        }, 5000)
     }
     else if(!persons.some((person) => person.name === newName)) {
         const personObject =  {
             name: newName,
             number: newNumber,
         }
-        createPerson(personObject)
-        .then(returnedPerson => {
+        createPerson(personObject).then(returnedPerson => {
             if(typeof returnedPerson !== 'number') {
                 setPersons(persons.concat(returnedPerson));
                 setNewNumber('');
                 setNewName('');
+                setMessage(`Added ${returnedPerson.name}`);
+                setTimeout(() => {
+                    setMessage('');
+                }, 5000)
             } else {
-                window.alert("Wrong return from server");
+                setErrorStatus(true);
+                setMessage("Wrong return from server");
+                setTimeout(() => {
+                    setMessage('');
+                    setErrorStatus(false);
+                }, 5000)
             }
         })
     } else {
@@ -56,31 +72,43 @@ const App = () => {
                 number: newNumber,
             }
 
-            updatePerson(oldObj.id,updatedPerson);
-            const newArr = persons.filter(obj =>
-                obj.id !== oldObj.id);
-            setPersons(newArr.concat(updatedPerson));
+            updatePerson(oldObj.id,updatedPerson).then(returnedPerson => {
+                const newArr = persons.filter(person =>
+                    person.id !== returnedPerson.id);
+                setPersons(newArr.concat(returnedPerson));
+                setMessage(`Updated ${returnedPerson.name}`);
+                setTimeout(() => {
+                    setMessage('');
+                }, 5000)
+            })            
         }            
     }
   }
 
     const deletePerson = (person) => {
-        console.log(person);
         if(window.confirm(`Do you really want to delete ${person.name}`)) {
-            deletePersonFromDb(person.id);
-            setPersons(persons.filter(obj => 
-                obj.id !== person.id))
+            deletePersonFromDb(person.id).then(status => {
+                if(status===200) {
+                    setPersons(persons.filter(obj =>
+                        obj.id !== person.id))
+                    setMessage(`Deleted ${person.name}`);
+                    setTimeout(() => {
+                        setMessage('');
+                    }, 5000)
+                }
+            })            
         }
     }
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <Filter change={handleFilterChange}/>
-      <h3>Add a new number</h3>
-      <PersonForm add={addPerson} nameChange={handleNameChange} numberChange={handleNumberChange}/>
-      <h3>Numbers</h3>
-      <Persons persons={persons} filter={filter} deletePerson={deletePerson}/>
+        <Notification message={message} err={errorStatus}/>
+        <h2>Phonebook</h2>
+        <Filter change={handleFilterChange}/>
+        <h3>Add a new number</h3>
+        <PersonForm add={addPerson} nameChange={handleNameChange} numberChange={handleNumberChange} newName={newName} newNumber={newNumber}/>
+        <h3>Numbers</h3>
+        <Persons persons={persons} filter={filter} deletePerson={deletePerson}/>
     </div>
   )
 }

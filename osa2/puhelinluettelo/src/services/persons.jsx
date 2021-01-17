@@ -8,7 +8,7 @@ export const getAllPersons = () => {
 
 export const createPerson = newObject => {
     const request = axios.post(baseUrl, newObject);
-    request.then(res => {
+    return request.then(res => {
         if (res.status === 201) {
             return res.data;
         } else {
@@ -20,10 +20,7 @@ export const createPerson = newObject => {
 export const deletePersonFromDb = id => {
     const url = baseUrl.concat(`/${id}`);
     const request = axios.delete(url);
-    request.then(res => {
-        console.log(res);
-        console.log(res.data);
-    })
+    return request.then(res => res.status);
 }
 
 export const updatePerson = (id, newObject) => {

@@ -5,7 +5,7 @@ const Persons = ({persons,filter, deletePerson}) => {
         <div>
             {persons.filter(person =>
             person.name.match(new RegExp(filter, 'i'))
-            ).map(person => 
+            ).sort((a, b) => a.id - b.id).map(person => 
                 <div key= { person.id }>
                     <p>{person.name} {person.number}</p>
                     <button onClick={() => deletePerson(person)}>Delete</button>
